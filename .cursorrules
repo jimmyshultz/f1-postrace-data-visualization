@@ -1,0 +1,93 @@
+# F1 Strategy Analyzer - Cursor Rules
+
+## Project Context
+- F1 post-race strategy analysis dashboard using Streamlit, FastF1, and Plotly
+- Python 3.10+ (for better type hints and pattern matching)
+- Target users: F1 enthusiasts and strategy analysts
+
+## Code Style & Standards
+- Follow PEP 8 for Python code formatting
+- Use type hints for all function signatures
+- Prefer dataclasses for data structures
+- Document all public functions with docstrings (Google style)
+- Keep functions focused and single-purpose
+
+## Project Structure
+- `app.py` - Main Streamlit application
+- `data/` - Data loading and preprocessing
+- `analysis/` - Business logic (strategy, degradation, comparison)
+- `visualization/` - Plotly chart generation
+- `utils/` - Helper functions and constants
+- `config/` - Configuration and settings
+
+## Technology Stack
+- Streamlit for UI
+- FastF1 for F1 data access
+- Plotly for interactive visualizations
+- Pandas/NumPy for data manipulation
+
+## Best Practices
+- Use `@st.cache_data` for expensive computations
+- Enable FastF1 caching to minimize API calls
+- Handle missing data gracefully with informative error messages
+- Use session state for UI state management
+- Keep visualizations interactive (hover, zoom, pan)
+
+## Testing Strategy
+- Unit tests for analysis functions (pytest)
+- Integration tests with cached session data
+- Test edge cases: wet races, VSC periods, DNFs
+- Known good sessions for regression testing:
+  - 2024 Bahrain GP (standard race)
+  - 2024 Monaco GP (safety car heavy)
+  - 2024 Singapore GP (high deg compound differences)
+
+## Performance Guidelines
+- Initial session load: < 30s (uncached) / < 2s (cached)
+- Chart rendering: < 1s for up to 20 drivers
+- Dashboard refresh: < 500ms
+- Use FastF1's pick_* methods for efficient driver filtering
+- Prefer pd.query() over boolean indexing for readability
+- Cache expensive aggregations with st.cache_data(ttl=3600)
+
+## Common Patterns
+- Always check if session is loaded before accessing data
+- Filter out invalid laps (pit laps, slow laps) for analysis
+- Use official F1 tire colors and team colors
+- Provide loading indicators for slow operations
+
+## Avoid
+- Hardcoding values that should be in config
+- Blocking UI thread with long operations
+- Over-fetching data (load only what's needed)
+- Inconsistent naming conventions
+
+## Error Handling
+- Wrap FastF1 API calls in try-except blocks
+- Log errors with context (session, driver, lap range)
+- Show user-friendly error messages in Streamlit
+- Gracefully degrade when optional data is unavailable
+
+## Data Validation
+- Validate session availability before loading
+- Check for minimum lap count thresholds
+- Verify driver existence in session
+- Handle timezone inconsistencies in lap data
+
+## Logging
+- Use Python's logging module (not print statements)
+- Log level: INFO for user actions, DEBUG for data ops
+- Include timestamps and session identifiers
+- Log cache hits/misses for performance monitoring
+
+## Streamlit Patterns
+- Use st.columns() for responsive layouts
+- Implement st.expander() for detailed analysis sections
+- Add st.download_button() for exporting analysis
+- Use st.sidebar for filters and session selection
+
+## FastF1 Best Practices
+- Check ergast API availability before querying
+- Handle mixed weather conditions (track status changes)
+- Account for sprint race format differences
+- Validate compound data (some sessions have incomplete tire info)

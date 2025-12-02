@@ -1,0 +1,17 @@
+# Core Framework
+streamlit==1.40.2
+
+# F1 Data
+fastf1==3.4.2
+
+# Data Processing
+pandas==2.2.3
+numpy==2.1.3
+
+# Visualization
+plotly==5.24.1
+matplotlib==3.9.2
+
+# Optional: Enhanced FastF1 features
+timple==0.1.7  # Better timedelta support
+requests-cache==1.2.1  # HTTP caching for FastF1

@@ -38,14 +38,14 @@ Transform raw F1 timing data into interactive visualizations that reveal strateg
 ### 2.3 Application Framework
 ```
 - Streamlit (v1.x): Web application framework
-- Python 3.9+: Core language
+- Python 3.10+: Core language
 ```
 
 ### 2.4 Development Tools
 ```
 - Git: Version control
 - pytest: Testing framework (future)
-- black/flake8: Code formatting (optional)
+- ruff: Code formatting and linting (replaces black/flake8)
 ```
 
 ---
@@ -823,21 +823,22 @@ streamlit run app.py
 ### 13.1 requirements.txt
 ```txt
 # Core
-streamlit==1.28.0
-fastf1==3.2.0
-pandas==2.1.0
-numpy==1.24.0
+streamlit==1.40.2
+fastf1==3.4.2
+pandas==2.2.3
+numpy==2.1.3
 
 # Visualization
-plotly==5.17.0
+plotly==5.24.1
 
-# Optional
-matplotlib==3.8.0  # For FastF1 plotting utilities
-seaborn==0.13.0    # Additional visualization options
+# Optional (Enhanced FastF1 features)
+matplotlib==3.9.2  # For FastF1 plotting utilities
+timple==0.1.7  # Better timedelta support for lap times
+requests-cache==1.2.1  # HTTP caching for FastF1 API calls
 ```
 
 ### 13.2 System Requirements
-- Python 3.9 or higher
+- Python 3.10 or higher
 - 4GB RAM minimum (8GB recommended)
 - 10GB disk space (for cache)
 - Internet connection (for data download)
