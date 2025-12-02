@@ -203,14 +203,14 @@ def get_head_to_head_summary(
     deltas = calculate_time_deltas(driver1_laps, driver2_laps)
 
     # Get final positions
-    pos1 = driver1_laps.iloc[-1].get("Position", "N/A")
-    pos2 = driver2_laps.iloc[-1].get("Position", "N/A")
+    pos1 = driver1_laps.iloc[-1].get("Position")
+    pos2 = driver2_laps.iloc[-1].get("Position")
 
     return {
         "driver1": driver1,
         "driver2": driver2,
-        "driver1_position": int(pos1) if pos1 != "N/A" else "N/A",
-        "driver2_position": int(pos2) if pos2 != "N/A" else "N/A",
+        "driver1_position": int(pos1) if pd.notna(pos1) else "N/A",
+        "driver2_position": int(pos2) if pd.notna(pos2) else "N/A",
         "driver1_faster_laps": driver1_faster,
         "driver2_faster_laps": driver2_faster,
         "equal_laps": equal,

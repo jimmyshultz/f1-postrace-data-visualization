@@ -306,7 +306,8 @@ def render_driver_statistics(driver: str, laps_df: pd.DataFrame) -> None:
 
     # Fastest lap
     fastest_lap = laps_df["LapTime"].min() if not laps_df.empty else None
-    fastest_lap_num = laps_df[laps_df["LapTime"] == fastest_lap].iloc[0]["LapNumber"] if fastest_lap else None
+    fastest_lap_rows = laps_df[laps_df["LapTime"] == fastest_lap] if pd.notna(fastest_lap) else pd.DataFrame()
+    fastest_lap_num = fastest_lap_rows.iloc[0]["LapNumber"] if not fastest_lap_rows.empty else None
     with col1:
         st.metric(
             "Fastest Lap",

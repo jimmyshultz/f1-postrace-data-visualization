@@ -151,8 +151,8 @@ def detect_cliff(laps_df: pd.DataFrame, threshold: float = 0.5) -> Optional[int]
 
     lap_times = laps_df["LapTime"].apply(lambda x: x.total_seconds()).values
 
-    # Calculate rolling difference
-    for i in range(1, len(lap_times) - 1):
+    # Calculate rolling difference - check all consecutive lap transitions
+    for i in range(1, len(lap_times)):
         time_jump = lap_times[i] - lap_times[i - 1]
         if time_jump > threshold:
             return int(laps_df.iloc[i]["LapNumber"])
