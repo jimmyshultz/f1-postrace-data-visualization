@@ -1,5 +1,6 @@
 """F1 team colors and tire compound colors."""
 
+from functools import lru_cache
 from typing import Dict
 
 # Tire Compound Colors (F1 Official)
@@ -26,6 +27,7 @@ TEAM_COLORS: Dict[str, str] = {
 }
 
 
+@lru_cache(maxsize=32)
 def get_tire_color(compound: str) -> str:
     """
     Get the official F1 color for a tire compound.
@@ -39,6 +41,7 @@ def get_tire_color(compound: str) -> str:
     return TIRE_COLORS.get(compound.upper(), "#CCCCCC")
 
 
+@lru_cache(maxsize=32)
 def get_team_color(team_name: str) -> str:
     """
     Get the team color for a given team.

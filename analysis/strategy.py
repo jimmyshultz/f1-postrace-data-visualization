@@ -1,12 +1,21 @@
 """Tire strategy analysis functions."""
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import List, Optional
 
 import pandas as pd
 
 logger = logging.getLogger(__name__)
+
+
+def _hash_dataframe(df: pd.DataFrame) -> int:
+    """Create a hash for DataFrame for caching purposes."""
+    if df.empty:
+        return 0
+    # Use a combination of shape and sample values
+    return hash((len(df), tuple(df.columns), df.iloc[0]["LapNumber"] if "LapNumber" in df.columns else 0))
 
 
 @dataclass
@@ -44,6 +53,8 @@ def calculate_stints(laps_df: pd.DataFrame) -> List[Stint]:
     Returns:
         List of Stint objects
     """
+    start_time = time.perf_counter()
+
     if laps_df.empty:
         return []
 
@@ -86,7 +97,8 @@ def calculate_stints(laps_df: pd.DataFrame) -> List[Stint]:
         if stint:
             stints.append(stint)
 
-    logger.debug(f"Calculated {len(stints)} stints for {driver}")
+    elapsed = (time.perf_counter() - start_time) * 1000  # ms
+    logger.debug(f"Calculated {len(stints)} stints for {driver} in {elapsed:.2f}ms")
     return stints
 
 
