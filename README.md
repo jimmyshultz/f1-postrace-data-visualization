@@ -83,8 +83,8 @@ session = fastf1.get_session(2024, 'Monaco', 'R')
 session.load()
 
 # Analyze Verstappen vs Leclerc
-ver_laps = session.laps.pick_driver('VER')
-lec_laps = session.laps.pick_driver('LEC')
+ver_laps = session.laps.pick_drivers('VER')
+lec_laps = session.laps.pick_drivers('LEC')
 ```
 
 ---
@@ -114,8 +114,7 @@ f1-postrace-data-visualization/
 │
 ├── visualization/
 │   ├── tire_timeline.py       # Tire strategy timeline chart
-│   ├── degradation_chart.py   # Lap time degradation plots
-│   └── position_chart.py      # Position changes visualization
+│   └── degradation_chart.py   # Lap time degradation plots
 │
 └── utils/
     ├── colors.py              # Team colors, tire colors
@@ -175,13 +174,13 @@ Known good sessions for testing and development:
 
 ## 🗺️ Roadmap
 
-### Phase 1: MVP ✅ (Current Focus)
+### Phase 1: MVP ✅ Complete!
 - [x] Project setup & configuration
-- [ ] Session selection UI
-- [ ] Tire strategy timeline visualization
-- [ ] Lap time degradation analysis
-- [ ] Basic statistics panel
-- [ ] Driver comparison mode
+- [x] Session selection UI
+- [x] Tire strategy timeline visualization
+- [x] Lap time degradation analysis
+- [x] Race statistics panel (grid position, final position, positions gained/lost)
+- [x] Driver comparison mode (head-to-head analysis)
 
 ### Phase 2: Enhancement
 - [ ] Position changes visualization (bumps chart)
@@ -279,7 +278,13 @@ Copyright (c) 2025 Jimmy Shultz
 
 ## 🎮 Demo
 
-*Coming soon: Screenshots and live demo link once MVP is complete*
+The MVP is complete! Run the app locally to explore F1 race strategies:
+
+```bash
+streamlit run app.py
+```
+
+**Recommended test session:** 2024 Bahrain Grand Prix (Race) - Compare VER vs LEC
 
 <!-- Future sections:
 ### Screenshots

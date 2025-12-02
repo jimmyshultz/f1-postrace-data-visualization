@@ -32,7 +32,9 @@ cache/
 *.cache
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml
+!.streamlit/config.toml
+!.streamlit/.gitkeep
 
 # IDE
 .vscode/
@@ -50,6 +52,10 @@ cache/
 .coverage
 htmlcov/
 *.cover
+
+# Linting
+.ruff_cache/
+.mypy_cache/
 
 # Data files (if you download any local data)
 data/*.csv
