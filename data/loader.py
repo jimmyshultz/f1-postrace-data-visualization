@@ -1,11 +1,13 @@
 """Data loading from FastF1."""
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import List, Optional
 
 import fastf1
 import pandas as pd
+import streamlit as st
 
 from config import settings
 
@@ -39,6 +41,7 @@ def enable_cache() -> None:
         logger.info(f"FastF1 cache enabled at: {settings.FASTF1_CACHE_PATH}")
 
 
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def get_race_schedule(year: int) -> pd.DataFrame:
     """
     Get the race schedule for a given year.
@@ -52,8 +55,11 @@ def get_race_schedule(year: int) -> pd.DataFrame:
     Raises:
         Exception: If unable to fetch schedule
     """
+    start_time = time.perf_counter()
     try:
         schedule = fastf1.get_event_schedule(year)
+        elapsed = (time.perf_counter() - start_time) * 1000
+        logger.debug(f"Fetched race schedule for {year} in {elapsed:.2f}ms")
         return schedule
     except Exception as e:
         logger.error(f"Failed to fetch schedule for {year}: {e}")
@@ -95,6 +101,7 @@ def load_session(year: int, race_name: str, session_type: str) -> Optional[Sessi
     Raises:
         Exception: If session loading fails
     """
+    start_time = time.perf_counter()
     enable_cache()
 
     logger.info(f"Loading {year} {race_name} - {session_type}")
@@ -122,9 +129,10 @@ def load_session(year: int, race_name: str, session_type: str) -> Optional[Sessi
         else:
             race_distance = 0
 
+        elapsed = time.perf_counter() - start_time
         logger.info(
             f"Successfully loaded session: {len(drivers)} drivers, "
-            f"{len(laps)} laps, {race_distance} lap race"
+            f"{len(laps)} laps, {race_distance} lap race in {elapsed:.2f}s"
         )
 
         return SessionData(

@@ -333,6 +333,7 @@ def render_analysis() -> None:
     from data.loader import get_driver_laps
     from utils.colors import get_team_color
     from visualization.degradation_chart import create_degradation_chart
+    from visualization.position_chart import create_position_chart
     from visualization.tire_timeline import (
         create_simple_stint_table,
         create_tire_timeline,
@@ -354,6 +355,19 @@ def render_analysis() -> None:
 
     st.divider()
 
+    # Get driver laps for insights preview (needed before full laps retrieval)
+    from data.loader import get_driver_laps as get_laps_for_insights
+
+    driver_1_laps_preview = get_laps_for_insights(session_data, driver_1)
+    driver_2_laps_preview = None
+    if driver_2 and st.session_state.comparison_mode:
+        driver_2_laps_preview = get_laps_for_insights(session_data, driver_2)
+
+    # Key Insights Panel
+    render_key_insights(driver_1, driver_1_laps_preview, driver_2, driver_2_laps_preview)
+
+    st.divider()
+
     # Get driver laps
     driver_1_laps = get_driver_laps(session_data, driver_1)
 
@@ -370,6 +384,28 @@ def render_analysis() -> None:
         driver_2_team_color = get_team_color(driver_2_team) if driver_2_team else None
         drivers_to_analyze.append((driver_2, driver_2_laps))
         drivers_for_degradation.append((driver_2, driver_2_laps, driver_2_team_color))
+
+    # Position Changes Chart (Bumps Chart)
+    st.subheader("📈 Position Changes")
+
+    # Option to show all drivers as background
+    show_all = st.checkbox(
+        "Show all drivers in background",
+        value=False,
+        key="show_all_drivers_position",
+        help="Display faded lines for all drivers to see the full race context",
+    )
+
+    position_fig = create_position_chart(
+        drivers_for_degradation,  # Uses same format: (driver, laps, team_color)
+        session_data.race_distance,
+        height=450,
+        show_all_drivers=show_all,
+        all_drivers_laps=session_data.laps if show_all else None,
+    )
+    st.plotly_chart(position_fig, use_container_width=True)
+
+    st.divider()
 
     # Tire Strategy Timeline
     st.subheader("🛞 Tire Strategy Timeline")
@@ -439,6 +475,10 @@ def render_analysis() -> None:
         st.divider()
         render_head_to_head_comparison(driver_1, driver_1_laps, driver_2, driver_2_laps)
 
+        # Sector Analysis (comparison mode only)
+        st.divider()
+        render_sector_analysis(driver_1, driver_1_laps, driver_2, driver_2_laps)
+
 
 def render_head_to_head_comparison(
     driver_1: str,
@@ -498,6 +538,116 @@ def render_head_to_head_comparison(
     strategy_comparison = compare_stints(driver_1_laps, driver_2_laps)
     if not strategy_comparison.empty:
         st.dataframe(strategy_comparison, use_container_width=True, hide_index=True)
+
+
+def render_key_insights(
+    driver_1: str,
+    driver_1_laps: pd.DataFrame,
+    driver_2: Optional[str],
+    driver_2_laps: Optional[pd.DataFrame],
+) -> None:
+    """Render key insights panel."""
+    from analysis.insights import (
+        format_insights_for_display,
+        generate_race_insights,
+    )
+
+    st.subheader("💡 Key Insights")
+
+    # Generate insights
+    comparison_laps = driver_2_laps if driver_2 and driver_2_laps is not None else None
+    insights = generate_race_insights(driver_1_laps, comparison_laps)
+
+    if not insights:
+        st.info("No significant insights detected for this selection.")
+        return
+
+    # Format insights for display
+    formatted = format_insights_for_display(insights)
+
+    # Display insights in columns by category
+    insight_categories = [
+        ("comparison", "⚔️ Comparison", "#E8F4F8"),
+        ("strategy", "🔧 Strategy", "#FFF3E0"),
+        ("degradation", "📉 Degradation", "#FBE9E7"),
+        ("pace", "⚡ Pace", "#E8F5E9"),
+    ]
+
+    # Filter to categories with insights
+    active_categories = [
+        (key, title, color) for key, title, color in insight_categories
+        if formatted.get(key)
+    ]
+
+    if not active_categories:
+        st.info("No significant insights detected for this selection.")
+        return
+
+    # Display top insights (limit to most important)
+    all_insights_flat = []
+    for key, _, _ in active_categories:
+        for icon, message in formatted[key]:
+            all_insights_flat.append((icon, message))
+
+    # Show top insights (max 6)
+    displayed = all_insights_flat[:6]
+
+    for icon, message in displayed:
+        st.markdown(f"{icon} {message}")
+
+    # Optionally show more in expander
+    if len(all_insights_flat) > 6:
+        with st.expander(f"Show all insights ({len(all_insights_flat)} total)"):
+            for icon, message in all_insights_flat[6:]:
+                st.markdown(f"{icon} {message}")
+
+
+def render_sector_analysis(
+    driver_1: str,
+    driver_1_laps: pd.DataFrame,
+    driver_2: str,
+    driver_2_laps: pd.DataFrame,
+) -> None:
+    """Render sector time comparison analysis."""
+    from analysis.sectors import (
+        get_sector_comparison_summary,
+        identify_weak_sectors,
+    )
+    from visualization.sector_chart import (
+        create_sector_advantage_chart,
+        create_sector_delta_chart,
+        create_sector_scatter,
+    )
+
+    st.subheader("🏁 Sector Analysis")
+
+    # Quick summary of sector advantages
+    weak_sectors = identify_weak_sectors(driver_1_laps, driver_2_laps)
+
+    if weak_sectors.get("summary"):
+        st.info(f"📊 **Summary:** {weak_sectors['summary']}")
+
+    # Sector advantage visualization
+    advantage_fig = create_sector_advantage_chart(driver_1_laps, driver_2_laps, height=250)
+    st.plotly_chart(advantage_fig, use_container_width=True)
+
+    # Detailed sector analysis in expander
+    with st.expander("📈 Detailed Sector Comparison", expanded=False):
+        # Sector comparison table
+        st.markdown("#### Sector Performance Summary")
+        sector_summary = get_sector_comparison_summary(driver_1_laps, driver_2_laps)
+        if not sector_summary.empty:
+            st.dataframe(sector_summary, use_container_width=True, hide_index=True)
+
+        # Sector times scatter plot
+        st.markdown("#### Sector Times Over Race")
+        scatter_fig = create_sector_scatter(driver_1_laps, driver_2_laps, height=400)
+        st.plotly_chart(scatter_fig, use_container_width=True)
+
+        # Lap-by-lap sector deltas
+        st.markdown("#### Sector Delta per Lap")
+        delta_fig = create_sector_delta_chart(driver_1_laps, driver_2_laps, height=350)
+        st.plotly_chart(delta_fig, use_container_width=True)
 
 
 if __name__ == "__main__":

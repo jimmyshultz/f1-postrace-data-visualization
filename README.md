@@ -18,7 +18,10 @@ F1 Strategy Analyzer transforms raw Formula 1 timing data into interactive visua
 - **📅 Session Selection**: Analyze any F1 race from 2018-2024
 - **🏁 Tire Strategy Timeline**: Visual representation of pit stop strategies and tire compounds
 - **📈 Lap Time Analysis**: Track tire degradation and performance over race distance
+- **📈 Position Changes**: Bumps chart showing race position throughout
 - **⚔️ Driver Comparison**: Compare strategies and pace between any two drivers
+- **🏁 Sector Analysis**: Identify where time is won/lost in each sector
+- **💡 Key Insights**: Auto-generated strategic insights and analysis
 - **📊 Race Statistics**: Comprehensive stint breakdowns and performance metrics
 - **🎨 Interactive Visualizations**: Zoom, hover, and explore your data with Plotly
 
@@ -110,11 +113,15 @@ f1-postrace-data-visualization/
 ├── analysis/
 │   ├── strategy.py            # Tire strategy calculations
 │   ├── degradation.py         # Lap time degradation analysis
-│   └── comparison.py          # Driver comparison logic
+│   ├── comparison.py          # Driver comparison logic
+│   ├── sectors.py             # Sector time analysis
+│   └── insights.py            # Auto-generated race insights
 │
 ├── visualization/
 │   ├── tire_timeline.py       # Tire strategy timeline chart
-│   └── degradation_chart.py   # Lap time degradation plots
+│   ├── degradation_chart.py   # Lap time degradation plots
+│   ├── position_chart.py      # Position changes (bumps chart)
+│   └── sector_chart.py        # Sector comparison charts
 │
 └── utils/
     ├── colors.py              # Team colors, tire colors
@@ -182,11 +189,11 @@ Known good sessions for testing and development:
 - [x] Race statistics panel (grid position, final position, positions gained/lost)
 - [x] Driver comparison mode (head-to-head analysis)
 
-### Phase 2: Enhancement
-- [ ] Position changes visualization (bumps chart)
-- [ ] Sector time comparison
-- [ ] Enhanced insights generation
-- [ ] Performance optimization
+### Phase 2: Enhancement ✅ Complete!
+- [x] Position changes visualization (bumps chart)
+- [x] Sector time comparison
+- [x] Enhanced insights generation
+- [x] Performance optimization (caching, timing logs)
 
 ### Phase 3: Advanced Features
 - [ ] What-if strategy simulator
